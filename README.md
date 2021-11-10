@@ -36,6 +36,6 @@ When making an API call :
 
 1. Set the request method, query parameters, and body as usual
 
-1. Set the actual service URL in a query named 'url'
+1. Set the actual service URL in a query named 'url' (encoded) 
 
 1. Send the request as usual
