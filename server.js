@@ -1,5 +1,6 @@
 let express = require('express'),
     request = require('request'),
+    http = require('http'),
     bodyParser = require('body-parser'),
     app = express();
 const url = require('url');
@@ -37,11 +38,24 @@ app.all('*', function (req, res, next) {
             targetURL = 'http://' + targetURL;
         }
         console.log(targetURL);
-        request({url: targetURL, method: req.method, json: req.body},
+
+        function RawPacketToString(x) {
+            let s = "";
+
+            return x.forEach(element => {
+                s += String.fromCharCode(parseInt(element, 16));
+            });
+        }
+        request({url: targetURL, method: req.method},
             function (error, response, body) {
-                console.log('body', body);
-                console.log('error', error);
-            }).pipe(res);
+                let fullResponse = body;
+                if (!response) {
+                    res.header("Content-Type", "application/json");
+                    fullResponse = JSON.stringify(error.rawPacket.toString());
+                }
+                res.send(200, fullResponse);
+                return fullResponse;
+            });
     }
 });
 
