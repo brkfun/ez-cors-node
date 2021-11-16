@@ -4,6 +4,11 @@ let express = require('express'),
     bodyParser = require('body-parser'),
     app = express();
 const url = require('url');
+if (typeof String.prototype.replaceAll == "undefined") {
+    String.prototype.replaceAll = function(match, replace) {
+        return this.replace(new RegExp(match, 'g'), () => replace);
+    }
+}
 
 const serialize = function (obj) {
     var str = [];
@@ -39,22 +44,14 @@ app.all('*', function (req, res, next) {
         }
         console.log(targetURL);
 
-        function RawPacketToString(x) {
-            let s = "";
-
-            return x.forEach(element => {
-                s += String.fromCharCode(parseInt(element, 16));
-            });
-        }
         request({url: targetURL, method: req.method},
             function (error, response, body) {
-                let fullResponse = body;
+                let Replacer = body;
                 if (!response) {
                     res.header("Content-Type", "application/json");
-                    fullResponse = JSON.stringify(error.rawPacket.toString());
+                    Replacer = error.rawPacket.toString().replace(/(\\r|\\n|\n|\r)/gm, "");
                 }
-                res.send(200, fullResponse);
-                return fullResponse;
+                res.send(200, Replacer);
             });
     }
 });
