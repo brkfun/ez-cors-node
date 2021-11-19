@@ -44,12 +44,14 @@ app.all('*', function (req, res, next) {
         }
         console.log(targetURL);
 
-        request({url: targetURL, method: req.method},
+        request({url: targetURL, method: req.method, timeout: 1000},
             function (error, response, body) {
                 let Replacer = body;
                 if (!response) {
                     res.header("Content-Type", "application/json");
-                    Replacer = error.rawPacket.toString().replace(/(\\r|\\n|\n|\r)/gm, "");
+                    if(error.rawPacket){
+                        Replacer = error.rawPacket.toString().replace(/(\\r|\\n|\n|\r)/gm, "");
+                    }
                 }
                 res.send(200, Replacer);
             });
